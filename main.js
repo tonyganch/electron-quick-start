@@ -2,33 +2,37 @@ const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const url = require('url')
 
-let mainWindow
+let firstWindow
+let secondWindow
 
 function createWindow () {
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  const window = new BrowserWindow({width: 800, height: 600})
 
-  mainWindow.loadURL(url.format({
+  window.loadURL(url.format({
     pathname: path.join(__dirname, 'index.html'),
     protocol: 'file:',
     slashes: true
   }))
 
+  window.webContents.openDevTools()
 
-  mainWindow.on('closed', function () {
-    mainWindow = null
-  })
+  return window
 }
 
-app.on('ready', createWindow)
+app.on('ready', () => {
+  firstWindow = createWindow()
+  firstWindow.on('closed', function () {
+    firstWindow = null
+  })
+
+  secondWindow = createWindow()
+  secondWindow.on('closed', function () {
+    secondWindow = null
+  })
+})
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit()
-  }
-})
-
-app.on('activate', function () {
-  if (mainWindow === null) {
-    createWindow()
   }
 })
